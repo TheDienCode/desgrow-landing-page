@@ -134,7 +134,7 @@
                     <div class="avatar" style="background-image: url('https://randomuser.me/api/portraits/women/44.jpg');"></div>
                     <div class="author-info">
                         <h4>Nguyễn Thu Hà</h4>
-                        <p>Founder Thương hiệu V-Boutique</p>
+                        <p>Founder Thời Trang Đỉnh Cao Vũ Trụ</p>
                     </div>
                 </div>
             </div>
@@ -146,7 +146,7 @@
                     <div class="avatar" style="background-image: url('https://randomuser.me/api/portraits/men/32.jpg');"></div>
                     <div class="author-info">
                         <h4>Hoàng Anh Tuấn</h4>
-                        <p>CEO Hệ Thống Phụ Kiện Z-Tech</p>
+                        <p>CEO Chuỗi Phụ Kiện Hành Tinh X</p>
                     </div>
                 </div>
             </div>
@@ -158,7 +158,7 @@
                     <div class="avatar" style="background-image: url('https://randomuser.me/api/portraits/women/68.jpg');"></div>
                     <div class="author-info">
                         <h4>Trần Minh Phương</h4>
-                        <p>CEO Chuỗi M-Beauty Spa</p>
+                        <p>Chủ Tịch Viện Thẩm Mỹ Xuyên Không</p>
                     </div>
                 </div>
             </div>
@@ -224,24 +224,28 @@
             </p>
             <form class="cta-form" id="google-sheet-form">
                 <div class="form-grid">
-                    <input type="text" name="HoVaTen" placeholder="Họ và tên của bạn *" required>
-                    <input type="tel" name="DienThoai" placeholder="Số điện thoại *" required>
-                    <input type="email" name="Email" placeholder="Email liên hệ *" required>
-                    <input type="text" name="Shop" placeholder="Đại diện cho Shop/Thương hiệu nào?">
+                    <input type="text" name="HoVaTen" placeholder="1. Họ và tên của bạn? *" required style="grid-column: 1 / -1;">
+                    <input type="tel" name="DienThoai" placeholder="2. Số điện thoại/Zalo để liên hệ tư vấn? *" required style="grid-column: 1 / -1;">
                     
-                    <select name="GoiDichVu" id="plan-select" required>
-                        <option value="" disabled selected>Chọn gói dịch vụ quan tâm *</option>
-                        <option value="basic">Gói Khởi Động (390k/tháng)</option>
-                        <option value="pro">Gói Bứt Phá (990k/tháng)</option>
-                        <option value="enterprise">Gói Tập Đoàn (Liên Hệ Định Giá)</option>
+                    <select name="LuotTinNhan" required style="grid-column: 1 / -1;">
+                        <option value="" disabled selected>3. Số lượng tin nhắn khách hàng đổ về mỗi ngày? *</option>
+                        <option value="Ít hơn 50">Ít hơn 50 tin nhắn/ngày</option>
+                        <option value="Từ 50 - 200">Từ 50 - 200 tin nhắn/ngày</option>
+                        <option value="Trên 200">Trên 200 tin nhắn/ngày</option>
                     </select>
 
-                    <select name="Nguon" required>
-                        <option value="" disabled selected>Bạn biết tới DesGrow qua đâu? *</option>
-                        <option value="fb">Facebook / TikTok</option>
-                        <option value="gg">Tìm kiếm Google</option>
-                        <option value="friend">Người quen giới thiệu</option>
-                        <option value="other">Kênh khác</option>
+                    <select name="VanDeGapPhai" required style="grid-column: 1 / -1;">
+                        <option value="" disabled selected>4. Vấn đề khiến bạn đau đầu nhất hiện tại? *</option>
+                        <option value="Phản hồi chậm">Phản hồi chậm khiến khách rớt sang đối thủ</option>
+                        <option value="Chi phí nhân sự">Đốt quá nhiều tiền trả lương nhân sự trực đêm</option>
+                        <option value="Remarketing">Khách hỏi giá xong bỏ đi không remarketing lại được</option>
+                        <option value="Khác">Vấn đề khác</option>
+                    </select>
+
+                    <select name="ThoiGianGiaiQuyet" required style="grid-column: 1 / -1;">
+                        <option value="" disabled selected>5. Mức độ ưu tiên giải quyết của bạn? *</option>
+                        <option value="Áp dụng ngay">Muốn áp dụng AI tự động hóa ngay trong tuần này</option>
+                        <option value="Đang tìm hiểu">Tôi chỉ đang tìm hiểu xem sao</option>
                     </select>
                 </div>
                 <button type="submit" id="submit-btn" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 3rem; width: 100%; margin-top: 1.5rem;">Đăng Ký Hỗ Trợ Ngay-Giảm 30%</button>
@@ -370,7 +374,7 @@
 
     <!-- Script to Handle Logic -->
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwQ0V-OrwoGmu4D3IzIOi5mQL1vrI7oTZdjY95FGbR_Y5Bky4Z8UFu1lLEs9ufTKv7ooQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxehT7O5ACGVD9hkEEbIyYJKnE224eThAjMJsK9Z4AVNe7RK1SIDXoIW-DnDqb2uVqjeQ/exec';
         const form = document.getElementById('google-sheet-form');
         const submitBtn = document.getElementById('submit-btn');
 
