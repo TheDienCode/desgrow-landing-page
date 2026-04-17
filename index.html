@@ -330,9 +330,31 @@
         <a href="https://zalo.me/0396931005" target="_blank" class="contact-btn zalo">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/2048px-Icon_of_Zalo.svg.png" alt="Zalo" width="30"/>
         </a>
-        <a href="https://m.me/nguyen.van.dien.508848" target="_blank" class="contact-btn messenger">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/2048px-Facebook_Messenger_logo_2020.svg.png" alt="Messenger" width="30"/>
-        </a>
+    </div>
+
+    <!-- Chatbot Widget -->
+    <div class="chatbot-widget" id="chatbot-widget">
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <span>DesGrow AI Assistant</span>
+                <span class="chatbot-close" id="chatbot-close">&times;</span>
+            </div>
+            <div class="chatbot-body" id="chatbot-body">
+                <div class="chat-msg chat-bot">Chào bạn 👋! Mình là trợ lý AI của DesGrow đây. Bạn đang tìm cách giải phóng thời gian trực Page để cho AI tự động chốt đơn đúng không? Mình có thể hỗ trợ giải đáp mọi thắc mắc hoặc báo giá cho bạn ngay lập tức. Bạn đang gặp khó khăn gì, cứ nhắn mình nhé!</div>
+                <div class="chat-options" id="chat-options-main">
+                    <button class="chat-btn" onclick="handleChat('cost', this)">Chi phí hàng tháng thế nào?</button>
+                    <button class="chat-btn" onclick="handleChat('register', this)">Tôi muốn đăng ký/dùng thử?</button>
+                    <button class="chat-btn" onclick="handleChat('think', this)">Để mình suy nghĩ thêm</button>
+                </div>
+            </div>
+            <div class="chatbot-input-area" id="chatbot-input-area">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button id="chat-send-btn">&#10148;</button>
+            </div>
+        </div>
+        <div class="chatbot-icon" id="chatbot-icon">
+            <svg viewBox="0 0 512 512" fill="#fff" width="35" height="35"><path d="M496 168v16c0 8.84-7.16 16-16 16h-24v64h24c8.84 0 16 7.16 16 16v16c0 8.84-7.16 16-16 16h-24v80c0 26.51-21.49 48-48 48H104c-26.51 0-48-21.49-48-48v-80H32c-8.84 0-16-7.16-16-16v-16c0-8.84 7.16-16 16-16h24v-64H32c-8.84 0-16-7.16-16-16v-16c0-8.84 7.16-16 16-16h24V144c0-26.51 21.49-48 48-48h96V64h-38.03c-7.46 0-13.97-5.2-15.65-12.51l-4.14-17.98c-1.85-8 4.22-15.5 12.37-15.5h104.9c8.15 0 14.22 7.5 12.37 15.5l-4.14 17.98c-1.68 7.3-8.19 12.51-15.65 12.51H248v32h96c26.51 0 48 21.49 48 48v24h24c8.84 0 16 7.16 16 16zM152 256c22.09 0 40-17.91 40-40s-17.91-40-40-40-40 17.91-40 40 17.91 40 40 40zm208-80c-22.09 0-40 17.91-40 40s17.91 40 40 40 40-17.91 40-40-17.91-40-40-40zM200 376h112v-24c0-13.25-10.75-24-24-24h-64c-13.25 0-24 10.75-24 24v24z"/></svg>
+        </div>
     </div>
 
     <!-- QR Payment Modal -->
@@ -430,6 +452,120 @@
         document.getElementById('btn-close-modal').addEventListener('click', () => {
             successModal.style.display = 'none';
         });
+
+        // Chatbot logic
+        const chatbotIcon = document.getElementById('chatbot-icon');
+        const chatbotWindow = document.getElementById('chatbot-window');
+        const chatbotClose = document.getElementById('chatbot-close');
+        const chatbotBody = document.getElementById('chatbot-body');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+
+        chatbotIcon.addEventListener('click', () => {
+            chatbotWindow.style.display = 'flex';
+            chatbotIcon.style.display = 'none';
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotWindow.style.display = 'none';
+            chatbotIcon.style.display = 'flex';
+        });
+
+        function processMessage(text, isButton = false) {
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg chat-user';
+            userMsg.innerText = text;
+            chatbotBody.appendChild(userMsg);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+
+            // Hide options
+            const options = chatbotBody.querySelectorAll('.chat-options');
+            options.forEach(opt => opt.style.display = 'none');
+
+            let type = 'general';
+            if (isButton) {
+                // ...
+            } else {
+                let lowerText = text.toLowerCase();
+                if (lowerText.includes('giá') || lowerText.includes('chi phí') || lowerText.includes('tiền') || lowerText.includes('bao nhiêu')) {
+                    type = 'cost';
+                } else if (lowerText.includes('đăng ký') || lowerText.includes('mua') || lowerText.includes('thử') || lowerText.includes('cọc')) {
+                    type = 'register';
+                } else if (lowerText.includes('nghĩ') || lowerText.includes('xem')) {
+                    type = 'think';
+                } else if (lowerText.includes('tìm hiểu') || lowerText.includes('thông tin') || lowerText.includes('hoạt động') || lowerText.includes('sao') || lowerText.includes('bot') || lowerText.includes('thế nào')) {
+                    type = 'info';
+                }
+            }
+
+            return type;
+        }
+
+        function handleChat(type, btn) {
+            btn.parentElement.style.display = 'none';
+            const text = btn.innerText;
+            
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg chat-user';
+            userMsg.innerText = text;
+            chatbotBody.appendChild(userMsg);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+            
+            replyBot(type);
+        }
+
+        function replyBot(type) {
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-msg chat-bot';
+
+                if (type === 'cost') {
+                    botMsg.innerText = "Không hề đắt đâu nha. Tính ra còn rẻ hơn thuê một bạn sinh viên part-time trực đêm. Gói Khởi Động chỉ từ 390k/tháng thôi. Thay vì trả lương vài triệu cho sale trực đêm mà vẫn sót tin nhắn, 390k này AI cày cho bạn 24/7 không biết mệt.";
+                } else if (type === 'register') {
+                    botMsg.innerHTML = "Tuyệt vời! Đầu tư cho DesGrow hôm nay, chốt gấp đôi đơn ngày mai. Nếu bạn đã sẵn sàng, hãy cọc trước 500k giữ slot VIP, đội trưởng chuyên gia sẽ gọi setup ngay!<br><a href='#quick-pay' class='chat-link' onclick='document.getElementById(\\'chatbot-close\\').click()'>Đăng ký / Đặt cọc ngay</a>";
+                } else if (type === 'think') {
+                    botMsg.innerHTML = "Không sao đâu, AI là hệ thống cần cân nhắc kỹ mà! Thay vì quyết định ngay, bạn cứ bỏ ra 1 phút điền form tư vấn nhé. Sẽ có chuyên gia liên hệ tư vấn đúng bệnh - đúng thuốc, hoàn toàn miễn phí nha!<br><a href='#cta' class='chat-link' onclick='document.getElementById(\\'chatbot-close\\').click()'>Điền form ngay</a>";
+                } else if (type === 'info') {
+                    botMsg.innerText = "DesGrow là trợ lý AI thông minh tích hợp trên Fanpage, trả lời khách trong 0.1 giây! AI này thấu hiểu ý định, học theo giọng điệu tự nhiên của bạn để dắt mượt như sale xịn. Bạn muốn tham khảo bảng giá hay đăng ký trải nghiệm thử?";
+                } else {
+                    botMsg.innerHTML = "AI của DesGrow đang được chạy thử nghiệm bằng kịch bản lập trình sẵn (cố định) nên đôi khi chưa bám theo các câu nói quá lạ. Tuy nhiên khi lên thực tế, đây là mô hình NLP siêu mềm mỏng! Bạn muốn xem thử báo giá không?";
+                }
+
+                chatbotBody.appendChild(botMsg);
+
+                if (type === 'cost' || type === 'general' || type === 'info') {
+                    const options = document.createElement('div');
+                    options.className = 'chat-options';
+                    options.innerHTML = `
+                        <button class="chat-btn" onclick="handleChat('cost', this)">Chi phí hàng tháng thế nào?</button>
+                        <button class="chat-btn" onclick="handleChat('register', this)">Tôi muốn đăng ký/dùng thử?</button>
+                    `;
+                    chatbotBody.appendChild(options);
+                }
+
+                chatbotBody.scrollTop = chatbotBody.scrollHeight;
+            }, 800);
+        }
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text) {
+                let inferredType = processMessage(text);
+                chatInput.value = '';
+                replyBot(inferredType);
+            }
+        }
+
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Tự động mở Chatbot sau 1.5 giây
+        setTimeout(() => {
+            chatbotWindow.style.display = 'flex';
+            chatbotIcon.style.display = 'none';
+        }, 1500);
     </script>
 </body>
 </html>
