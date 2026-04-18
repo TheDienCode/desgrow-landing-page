@@ -257,31 +257,43 @@
     <!-- Quick Payment Section -->
     <section class="container" id="quick-pay" style="margin-top: 3rem; margin-bottom: 3rem;">
         <div class="glass-panel" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 2.5rem 2rem;">
-            <h2 style="color: var(--accent-color); margin-bottom: 15px; font-size: 1.8rem;">Luồng Thanh Toán Nhanh Cho Khách VIP</h2>
+            <h2 style="color: var(--accent-color); margin-bottom: 15px; font-size: 1.8rem;">Thanh Toán Trực Tuyến & Tự Động</h2>
             <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 25px;">
-                Bạn quá bận để điền form? Quét mã cọc ngay <strong>500.000đ</strong> dưới đây, sau đó gửi ảnh hoá đơn qua Zalo góc dưới bên phải, chuyên gia cấp cao sẽ chủ động gọi tên bạn ngay lập tức!
+                Hoàn tất thông tin dưới đây để chuyển khoản tự động. Hệ thống sẽ kích hoạt dịch vụ tự động ngay sau khi tiền vào tài khoản!
             </p>
             
-            <div class="qr-wrapper" style="box-shadow: 0 10px 30px rgba(255, 0, 51, 0.2);">
-                <img src="https://img.vietqr.io/image/970436-1027250003-compact2.png?amount=500000&addInfo=Coc%20giu%20cho&accountName=PHAM%20TRAN%20MINH%20TUYEN" alt="Mã QR Vietcombank" class="qr-img">
-            </div>
-
-            <div class="bank-info" style="text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin: 20px auto; max-width: 400px; font-size: 0.95rem;">
-                <p style="margin-bottom: 8px;">🏦 Ngân hàng: <strong>Vietcombank</strong></p>
-                <p style="margin-bottom: 8px;">👤 Chủ tài khoản: <strong>PHAM TRAN MINH TUYEN</strong></p>
-                <p style="margin-bottom: 8px;">💳 Số tài khoản: <strong>1027250003</strong> 
-                   <span class="copy-btn" onclick="navigator.clipboard.writeText('1027250003'); alert('Đã copy số tài khoản!');">📋 Copy</span>
-                </p>
-                <p style="margin-bottom: 8px;">💰 Số tiền cọc: <strong style="color: var(--accent-color);">500.000đ</strong></p>
-                <p style="margin-bottom: 0;">📝 Nội dung: <strong>Coc giu cho</strong> 
-                   <span class="copy-btn" onclick="navigator.clipboard.writeText('Coc giu cho'); alert('Đã copy nội dung!');">📋 Copy</span>
-                </p>
+            <div id="checkout-form-container">
+                <form id="checkout-form" style="text-align: left; max-width: 400px; margin: 0 auto;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="color: #ccc; font-size: 0.9rem;">Họ Tên</label>
+                        <input type="text" id="co-name" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="color: #ccc; font-size: 0.9rem;">Số Điện Thoại</label>
+                        <input type="tel" id="co-phone" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #ccc; font-size: 0.9rem;">Sản Phẩm</label>
+                        <select id="co-product" required style="width: 100%; padding: 10px; background: rgba(20,20,20,1); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+                            <option value="">Đang tải đồ...</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">Tạo Đơn Hàng & Lấy Mã QR</button>
+                </form>
             </div>
             
-            <div style="margin-top: 20px;">
-                <a href="https://zalo.me/0396931005" target="_blank" class="btn btn-outline" style="width: 100%; max-width: 400px; border-color: #0084ff; color: #0084ff;">
-                    Gửi Bill Qua Zalo Ngay
-                </a>
+            <div id="checkout-qr-container" style="display: none;">
+                <div class="qr-wrapper" style="box-shadow: 0 10px 30px rgba(255, 0, 51, 0.2);">
+                    <img id="co-qr-img" src="" alt="Mã QR Vietcombank (SePay)" class="qr-img">
+                </div>
+                <div class="bank-info" style="text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin: 20px auto; max-width: 400px; font-size: 0.95rem;">
+                    <p style="margin-bottom: 8px;">Mã đơn hàng: <strong id="co-des" style="color: white;"></strong></p>
+                    <p style="margin-bottom: 8px;">Số tiền: <strong id="co-amt" style="color: var(--accent-color);"></strong>đ</p>
+                </div>
+                <div id="payment-status">
+                     <p style="color: #ffcc00; margin-bottom: 15px;" id="payment-status-text">⏳ Đang chờ hệ thống quét giao dịch... (10s)</p>
+                     <button onclick="simulateSepayWebhook()" class="btn btn-outline" style="font-size: 0.8rem; padding: 5px 10px; border-color: #777; color: #ccc;">[Dành cho Demo] Mô Phỏng SePay Bắn Tiền</button>
+                </div>
             </div>
         </div>
     </section>
@@ -363,14 +375,14 @@
             <h3>Tham Gia Luồng Ưu Tiên!</h3>
             <p style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 20px;">Vui lòng cọc trước <strong>500.000đ</strong> để hệ thống khóa Slot ngay lập tức và ưu tiên đội trưởng chuyên gia liên hệ hỗ trợ riêng cho bạn!</p>
             <div class="qr-wrapper">
-                <img src="https://img.vietqr.io/image/970436-1027250003-compact2.png?amount=500000&addInfo=Coc%20giu%20cho&accountName=PHAM%20TRAN%20MINH%20TUYEN" alt="Mã QR Vietcombank" class="qr-img">
+                <img src="https://qr.sepay.vn/img?acc=1027250003&bank=Vietcombank&amount=500000&des=Coc%20giu%20cho" alt="Mã QR Vietcombank (SePay)" class="qr-img">
             </div>
 
             <div class="bank-info" style="text-align: left; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 0.9rem;">
-                <p style="margin-bottom: 5px;">🏦 Ngân hàng: <strong>Vietcombank</strong></p>
-                <p style="margin-bottom: 5px;">👤 Chủ tài khoản: <strong>PHAM TRAN MINH TUYEN</strong></p>
-                <p style="margin-bottom: 5px;">💳 Số tài khoản: <strong>1027250003</strong> 
-                   <span class="copy-btn" onclick="navigator.clipboard.writeText('1027250003'); alert('Đã copy số tài khoản!');">📋 Copy</span>
+                <p style="margin-bottom: 5px;">🏦 Ngân hàng: <strong>TPBank</strong></p>
+                <p style="margin-bottom: 5px;">👤 Chủ tài khoản: <strong>NGUYEN VAN DIEN</strong></p>
+                <p style="margin-bottom: 5px;">💳 Số tài khoản: <strong>00005244297</strong> 
+                   <span class="copy-btn" onclick="navigator.clipboard.writeText('00005244297'); alert('Đã copy số tài khoản!');">📋 Copy</span>
                 </p>
                 <p style="margin-bottom: 5px;">💰 Số tiền cọc: <strong style="color: var(--accent-color);">500.000đ</strong></p>
                 <p style="margin-bottom: 0;">📝 Nội dung: <strong>Coc giu cho</strong> 
@@ -560,6 +572,87 @@
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
+
+        // Xử lý luồng Checkout
+        let currentOrderId = null;
+        let pollInterval = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/products')
+                .then(r => r.json())
+                .then(products => {
+                    const select = document.getElementById('co-product');
+                    select.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+                    products.forEach(p => {
+                        select.innerHTML += `<option value="${p.id}">${p.name} - ${Number(p.price).toLocaleString('vi-VN')}đ</option>`;
+                    });
+                }).catch(e => console.log('Chưa load được API:', e));
+        });
+
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('co-name').value,
+                phone: document.getElementById('co-phone').value,
+                product_id: document.getElementById('co-product').value
+            };
+            
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(data => {
+                if(data.order_id) {
+                    currentOrderId = data.order_id;
+                    document.getElementById('checkout-form-container').style.display = 'none';
+                    document.getElementById('checkout-qr-container').style.display = 'block';
+                    
+                    const bank = "TPBank";
+                    const account = "00005244297";
+                    
+                    document.getElementById('co-des').innerText = data.description;
+                    document.getElementById('co-amt').innerText = Number(data.amount).toLocaleString('vi-VN');
+                    document.getElementById('co-qr-img').src = `https://qr.sepay.vn/img?acc=${account}&bank=${bank}&amount=${data.amount}&des=${data.description}`;
+                    
+                    // Start polling
+                    pollInterval = setInterval(checkOrderStatus, 3000);
+                } else {
+                    alert('Lỗi tạo đơn hàng!');
+                }
+            });
+        });
+
+        function checkOrderStatus() {
+            if(!currentOrderId) return;
+            fetch('/api/order-status/' + currentOrderId)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        clearInterval(pollInterval);
+                        document.getElementById('payment-status').innerHTML = `
+                            <h3 style="color: #28a745; font-size: 1.5rem; margin-bottom:10px;">🎉 Thanh Toán Thành Công!</h3>
+                            <p style="color: white;">Cảm ơn bạn, hệ thống đã nhận được tiền. Đội ngũ DesGrow sẽ liên hệ bạn ngay lập tức!</p>
+                        `;
+                    }
+                });
+        }
+
+        // Dành cho phương án 2: Mô phỏng test
+        function simulateSepayWebhook() {
+            if(!currentOrderId) return;
+            const content = `NAP TIEN DH${currentOrderId} TEST`;
+            fetch('/api/sepay-webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            }).then(r => r.json()).then(data => {
+                if(data.success) {
+                    // checkOrderStatus will automatically pick up the change
+                } else {
+                    alert('Fake Webhook failed');
+                }
+            });
+        }
 
         // Tự động mở Chatbot sau 1.5 giây
         setTimeout(() => {

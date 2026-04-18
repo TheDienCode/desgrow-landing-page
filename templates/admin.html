@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>DesGrow Admin Panel</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 0; }
+        .header { background: #1a1a1a; color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 1.5rem; }
+        .container { max-width: 1200px; margin: 20px auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
+        
+        .tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
+        .tab-btn { padding: 15px 25px; cursor: pointer; border: none; background: none; font-size: 1rem; font-weight: bold; color: #666; transition: 0.3s; }
+        .tab-btn:hover { background: #eee; }
+        .tab-btn.active { color: #ff0033; border-bottom: 3px solid #ff0033; background: #fff; }
+        
+        .tab-content { padding: 20px 30px; display: none; }
+        .tab-content.active { display: block; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background: #f9f9f9; font-weight: bold; }
+        tr:hover { background: #f5f5f5; }
+
+        .btn { padding: 8px 15px; background: #ff0033; color: white; border: none; cursor: pointer; border-radius: 4px; text-decoration: none; font-size: 0.9rem; }
+        .btn:hover { background: #cc0029; }
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        
+        .form-row { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 20px; background: #fdfdfd; padding: 15px; border: 1px dashed #ccc; border-radius: 5px; }
+        .form-group { display: flex; flex-direction: column; flex: 1; }
+        .form-group label { font-size: 0.85rem; margin-bottom: 5px; color: #555; }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
+        
+        .badge { padding: 5px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: #fff;}
+        .badge-pending { background: #ffc107; color: #000; }
+        .badge-success { background: #28a745; }
+
+        .flash-messages { padding: 10px; background: #ffeeba; color: #856404; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DesGrow CRM Admin</h1>
+        <div>
+            <a href="/" style="color: #fff; text-decoration: none; margin-right: 15px;">&larr; Xem Website</a>
+            <a href="/logout" style="color: #ff9999; text-decoration: none; font-weight: bold;">Đăng Xuất</a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div>{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-products')">📦 Sản Phẩm</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-customers')">👥 Khách Hàng</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-orders')">💵 Đơn Hàng</button>
+        </div>
+
+        <!-- TAB KHÁCH HÀNG -->
+        <div id="tab-customers" class="tab-content">
+            <h3>Danh sách Khách Hàng</h3>
+            <form action="/admin/customers/add" method="POST" class="form-row">
+                <div class="form-group">
+                    <label>Tên Khách Hàng</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>SĐT</label>
+                    <input type="text" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Zalo</label>
+                    <input type="text" name="zalo">
+                </div>
+                <button type="submit" class="btn">Thêm Khách</button>
+            </form>
+
+            <table>
+                <tr>
+                    <th>ID</th><th>Tên</th><th>Số điện thoại</th><th>Zalo</th><th>Ngày ĐK</th><th>Hành động</th>
+                </tr>
+                {% for c in customers %}
+                <tr>
+                    <td>{{ c.id }}</td>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.phone }}</td>
+                    <td>{{ c.zalo }}</td>
+                    <td>{{ c.registered_at }}</td>
+                    <td>
+                        <form action="/admin/customers/delete/{{ c.id }}" method="POST" style="display:inline;" onsubmit="return confirm('Chắc chắn xóa?');">
+                            <button type="submit" class="btn btn-small btn-danger">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- TAB TRỌNG TÂM: SẢN PHẨM -->
+        <div id="tab-products" class="tab-content active">
+            <h3>Danh sách Sản Phẩm</h3>
+            <form action="/admin/products/add" method="POST" class="form-row">
+                <div class="form-group">
+                    <label>Tên Sản Phẩm*</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Giá bán*</label>
+                    <input type="number" name="price" required>
+                </div>
+                <div class="form-group">
+                    <label>Tồn Kho*</label>
+                    <input type="number" name="stock" value="10" required>
+                </div>
+                <button type="submit" class="btn">Thêm SP</button>
+            </form>
+
+            <table>
+                <tr>
+                    <th>ID</th><th>Tên</th><th>Giá</th><th>Tồn Kho (Auto trừ)</th><th>Hành động</th>
+                </tr>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td>{{ "{:,.0f}".format(p.price) }}đ</td>
+                    <td>
+                        <span style="font-weight: bold; color: {% if p.stock > 0 %}green{% else %}red{% endif %}">
+                            {{ p.stock }}
+                        </span>
+                    </td>
+                    <td>
+                        <form action="/admin/products/delete/{{ p.id }}" method="POST" style="display:inline;" onsubmit="return confirm('Chắc chắn xóa?');">
+                            <button type="submit" class="btn btn-small btn-danger">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- TAB ĐƠN HÀNG -->
+        <div id="tab-orders" class="tab-content">
+            <h3>Quản lý Đơn Hàng</h3>
+            
+            <form action="/admin/orders/add" method="POST" class="form-row">
+                <div class="form-group">
+                    <label>Khách hàng*</label>
+                    <select name="customer_id" required>
+                        <option value="">-- Chọn --</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}">{{ c.name }} ({{ c.phone }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sản phẩm*</label>
+                    <select name="product_id" required>
+                        <option value="">-- Chọn --</option>
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.name }} - Kho: {{ p.stock }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Số Tiền Checkout*</label>
+                    <input type="number" name="amount" value="500000" required>
+                </div>
+                <button type="submit" class="btn">Tạo Đơn Ghi Nợ (Pending)</button>
+            </form>
+
+            <table>
+                <tr>
+                    <th>ID Đơn</th><th>Khách Hàng</th><th>Sản Phẩm</th><th>Tổng Tiền</th><th>Trạng thái</th><th>Action</th>
+                </tr>
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td>{{ o.customer_name }}</td>
+                    <td>{{ o.product_name }}</td>
+                    <td>{{ "{:,.0f}".format(o.amount) }}đ</td>
+                    <td>
+                        {% if o.status == 'pending' %}
+                            <span class="badge badge-pending">Pending</span>
+                        {% else %}
+                            <span class="badge badge-success">Success</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if o.status == 'pending' %}
+                        <form action="/admin/orders/status/{{ o.id }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="status" value="success">
+                            <button type="submit" class="btn btn-small" style="background:#28a745">Đã CK Thành công (SePay)</button>
+                        </form>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
