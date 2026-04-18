@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 import sqlite3
 import os
+import threading
+import email_service
 
 app = Flask(__name__, static_folder='.', static_url_path='', template_folder='templates')
 app.secret_key = 'desgrow_secret'
@@ -35,6 +37,15 @@ def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+# Auto-migrate db: add email column to customers if not exists
+try:
+    _conn = sqlite3.connect(DB_PATH)
+    _conn.execute('ALTER TABLE customers ADD COLUMN email TEXT')
+    _conn.commit()
+    _conn.close()
+except sqlite3.OperationalError:
+    pass
 
 @app.route('/')
 def index():
@@ -117,7 +128,17 @@ def add_order():
     conn.execute('INSERT INTO orders (product_id, customer_id, amount, ordered_at) VALUES (?, ?, ?, datetime("now"))',
                  (product_id, customer_id, amount))
     conn.commit()
+
+    # Thêm code gửi email xác nhận đặt hàng
+    cur = conn.execute('SELECT name, email FROM customers WHERE id = ?', (customer_id,))
+    customer = cur.fetchone()
+    cur = conn.execute('SELECT name FROM products WHERE id = ?', (product_id,))
+    product = cur.fetchone()
     conn.close()
+    
+    if customer and customer['email'] and product:
+        threading.Thread(target=email_service.send_order_confirmation, args=(customer['name'], customer['email'], product['name'], float(amount))).start()
+        
     return redirect(url_for('admin'))
 
 @app.route('/admin/orders/status/<int:id>', methods=('POST',))
@@ -143,6 +164,7 @@ def api_checkout():
     data = request.json
     name = data.get('name')
     phone = data.get('phone')
+    email = data.get('email', '')
     product_id = data.get('product_id')
     
     conn = get_db_connection()
@@ -150,9 +172,14 @@ def api_checkout():
     customer = cur.fetchone()
     if customer:
         customer_id = customer['id']
+        if email:
+            conn.execute('UPDATE customers SET email = ? WHERE id = ?', (email, customer_id))
     else:
-        cur = conn.execute('INSERT INTO customers (name, phone, registered_at) VALUES (?, ?, datetime("now"))', (name, phone))
+        cur = conn.execute('INSERT INTO customers (name, phone, email, registered_at) VALUES (?, ?, ?, datetime("now"))', (name, phone, email))
         customer_id = cur.lastrowid
+        # Gửi chuỗi email chăm sóc nếu có email
+        if email:
+            threading.Thread(target=email_service.send_waitlist_sequence, args=(name, email)).start()
         
     cur = conn.execute('SELECT price, stock FROM products WHERE id = ?', (product_id,))
     product = cur.fetchone()

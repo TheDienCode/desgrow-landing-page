@@ -271,6 +271,10 @@
                         <input type="text" id="co-name" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
                     </div>
                     <div style="margin-bottom: 15px;">
+                        <label style="color: #ccc; font-size: 0.9rem;">Email nhận thông tin</label>
+                        <input type="email" id="co-email" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
                         <label style="color: #ccc; font-size: 0.9rem;">Số Điện Thoại</label>
                         <input type="tel" id="co-phone" required style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
                     </div>
@@ -581,6 +585,7 @@
             const payload = {
                 name: document.getElementById('co-name').value,
                 phone: document.getElementById('co-phone').value,
+                email: document.getElementById('co-email').value,
                 product_id: document.getElementById('co-product').value
             };
             
