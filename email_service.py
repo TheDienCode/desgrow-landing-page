@@ -37,17 +37,24 @@ def load_email_sequence():
         emails.append({'subject': subject, 'body': body})
     return emails
 
+def log_debug(msg):
+    log_path = os.path.join(os.path.dirname(__file__), 'email_debug.log')
+    with open(log_path, 'a', encoding='utf-8') as f:
+        f.write(f"{datetime.now().isoformat()} - {msg}\n")
+    print(msg, flush=True)
+
 def send_waitlist_sequence(name, email):
     if not resend.api_key:
-        print("Không tìm thấy API Key Resend")
+        log_debug("Không tìm thấy API Key Resend")
         return
 
     emails = load_email_sequence()
     if len(emails) < 3:
-        print("Không đủ 3 email trong file sequence.")
+        log_debug("Không đủ 3 email trong file sequence.")
         return
 
-    is_test = '+test' in email.lower()
+    is_test = 'test' in name.lower() or '+test' in email.lower()
+    log_debug(f"Bắt đầu chuỗi gửi mail cho {email}. Chế độ test: {is_test}")
     
     for idx, em in enumerate(emails[:3]):
         subject = em['subject']
@@ -75,10 +82,10 @@ def send_waitlist_sequence(name, email):
                 params["scheduled_at"] = send_time.isoformat() + "Z"
         
         try:
-            resend.Emails.send(params)
-            print(f"Đã lên lịch hoặc gửi Email {idx+1} cho {email}")
+            r = resend.Emails.send(params)
+            log_debug(f"Thành công gửi {idx+1} cho {email}: {r}")
         except Exception as e:
-            print(f"Lỗi gửi email: {e}")
+            log_debug(f"Lỗi gửi email {idx+1}: {e}")
 
 def send_order_confirmation(name, email, product_name, amount):
     if not resend.api_key: return
@@ -102,7 +109,7 @@ def send_order_confirmation(name, email, product_name, amount):
         "html": f"<p>{body}</p>"
     }
     try:
-        resend.Emails.send(params)
-        print(f"Đã gửi email xác nhận đơn hàng cho {email}")
+        r = resend.Emails.send(params)
+        log_debug(f"Thành công gửi email đơn hàng cho {email}: {r}")
     except Exception as e:
-        print(f"Lỗi gửi email xác nhận: {e}")
+        log_debug(f"Lỗi gửi email xác nhận: {e}")
