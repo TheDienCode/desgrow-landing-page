@@ -12,7 +12,7 @@ def load_resend_api_key():
 resend.api_key = load_resend_api_key()
 
 def load_email_sequence():
-    seq_path = os.path.join(os.path.expanduser('~'), 'OneDrive', 'Desktop', 'My brain for DesGrow', 'email_sequence.md')
+    seq_path = os.path.join(os.path.dirname(__file__), 'email_sequence.md')
     if not os.path.exists(seq_path):
         return ["Email 1 Placeholder", "Email 2 Placeholder", "Email 3 Placeholder"]
     
