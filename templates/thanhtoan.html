@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - DesGrow</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; }
+    </style>
+</head>
+<body>
+    <nav style="padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <a href="/" style="color: #fff; text-decoration: none; font-size: 1.2rem; font-weight: bold;">&larr; Quay lại Trang chủ</a>
+    </nav>
+    <section class="container" id="quick-pay" style="margin-top: 3rem; margin-bottom: 3rem;">
+        <div class="glass-panel" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 2.5rem 2rem;">
+            <h2 style="color: var(--accent-color); margin-bottom: 15px; font-size: 1.8rem;">Thanh Toán Trực Tuyến & Tự Động</h2>
+            <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 25px;">
+                Hoàn tất thông tin dưới đây để chuyển khoản tự động. Hệ thống sẽ kích hoạt dịch vụ tự động ngay sau khi tiền vào tài khoản!
+            </p>
+            
+            <div id="checkout-qr-container" style="display: none;">
+                <div class="qr-wrapper" style="box-shadow: 0 10px 30px rgba(255, 0, 51, 0.2);">
+                    <img id="co-qr-img" src="" alt="Mã QR Vietcombank (SePay)" class="qr-img" style="max-width: 100%; border-radius: 10px;">
+                </div>
+                <div class="bank-info" style="text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin: 20px auto; max-width: 400px; font-size: 0.95rem;">
+                    <p style="margin-bottom: 8px;">🏦 Ngân hàng: <strong>TPBank</strong></p>
+                    <p style="margin-bottom: 8px;">👤 Chủ tài khoản: <strong>NGUYEN VAN DIEN</strong></p>
+                    <p style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">💳 Số tài khoản: <strong>00005244297</strong> 
+                       <span class="copy-btn" onclick="navigator.clipboard.writeText('00005244297'); alert('Đã copy số tài khoản!');" style="cursor: pointer; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; float: right;">📋 Copy</span>
+                    </p>
+                    <p style="margin-bottom: 8px;">Mã đơn hàng: <strong id="co-des" style="color: white;"></strong></p>
+                    <p style="margin-bottom: 8px;">Số tiền: <strong id="co-amt" style="color: var(--accent-color);"></strong>đ</p>
+                </div>
+                <div id="payment-status">
+                     <p style="color: #ffcc00; margin-bottom: 15px;" id="payment-status-text">⏳ Đang chờ hệ thống quét giao dịch... (<span id="countdown-timer">60</span>s)</p>
+                </div>
+                <button onclick="window.location.href='/'" class="btn btn-outline" style="margin-top: 20px; width: 100%;">Trở Lại Trang Chủ</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentOrderId = null;
+        let pollInterval = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id');
+            const amount = urlParams.get('amount');
+            const des = urlParams.get('des');
+
+            if(orderId && amount && des) {
+                currentOrderId = orderId;
+                document.getElementById('checkout-qr-container').style.display = 'block';
+                
+                const bank = "TPBank";
+                const account = "00005244297";
+                
+                document.getElementById('co-des').innerText = des;
+                document.getElementById('co-amt').innerText = Number(amount).toLocaleString('vi-VN');
+                document.getElementById('co-qr-img').src = `https://qr.sepay.vn/img?acc=${account}&bank=${bank}&amount=${amount}&des=${des}`;
+                
+                pollInterval = setInterval(checkOrderStatus, 3000);
+                startCountdown(60);
+            } else {
+                document.getElementById('checkout-qr-container').innerHTML = '<p style="color: red; padding: 20px;">Dữ liệu đơn hàng không hợp lệ. Vui lòng quay lại.</p>';
+                document.getElementById('checkout-qr-container').style.display = 'block';
+            }
+        });
+
+        let countdownInterval;
+        function startCountdown(seconds) {
+            let timeLeft = seconds;
+            const timerEl = document.getElementById('countdown-timer');
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                if(timerEl) timerEl.innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    clearInterval(pollInterval);
+                    const statusText = document.getElementById('payment-status-text');
+                    if(statusText) statusText.innerHTML = "❌ Hết hạn quét mã giao dịch tĩnh. Vui lòng trở lại trang chủ tạo mới.";
+                }
+            }, 1000);
+        }
+
+        function showSuccessPopup() {
+            document.getElementById('checkout-qr-container').innerHTML = `
+                <div style="background: rgba(40, 167, 69, 0.1); border: 2px solid #28a745; padding: 30px; border-radius: 15px; margin-top: 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">✅</div>
+                    <h3 style="color: #28a745; font-size: 1.8rem; margin-bottom: 15px;">Thanh Toán Thành Công!</h3>
+                    <p style="color: white; font-size: 1.1rem; line-height: 1.6;">Hệ thống đã nhận được tiền. Hãy chờ được nhân viên liên hệ để kích hoạt dịch vụ tự động ngay nhé!</p>
+                    <button onclick="window.location.href='/'" class="btn btn-primary" style="margin-top: 25px; width: 100%;">Trở Lại Trang Chủ</button>
+                </div>
+            `;
+        }
+
+        function checkOrderStatus() {
+            if(!currentOrderId) return;
+            fetch('/api/order-status/' + currentOrderId)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        clearInterval(pollInterval);
+                        if(countdownInterval) clearInterval(countdownInterval);
+                        showSuccessPopup();
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

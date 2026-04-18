@@ -254,12 +254,14 @@
         </div>
     </section>
 
+
+
     <!-- Quick Payment Section -->
     <section class="container" id="quick-pay" style="margin-top: 3rem; margin-bottom: 3rem;">
         <div class="glass-panel" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 2.5rem 2rem;">
             <h2 style="color: var(--accent-color); margin-bottom: 15px; font-size: 1.8rem;">Thanh Toán Trực Tuyến & Tự Động</h2>
             <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 25px;">
-                Hoàn tất thông tin dưới đây để chuyển khoản tự động. Hệ thống sẽ kích hoạt dịch vụ tự động ngay sau khi tiền vào tài khoản!
+                Hoàn tất thông tin dưới đây để nhận mã QR. Hệ thống sẽ kích hoạt dịch vụ tự động ngay sau khi tiền vào tài khoản!
             </p>
             
             <div id="checkout-form-container">
@@ -278,22 +280,8 @@
                             <option value="">Đang tải đồ...</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">Tạo Đơn Hàng & Lấy Mã QR</button>
+                    <button type="submit" id="co-submit-btn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">Tạo Đơn Hàng & Lấy Mã QR</button>
                 </form>
-            </div>
-            
-            <div id="checkout-qr-container" style="display: none;">
-                <div class="qr-wrapper" style="box-shadow: 0 10px 30px rgba(255, 0, 51, 0.2);">
-                    <img id="co-qr-img" src="" alt="Mã QR Vietcombank (SePay)" class="qr-img">
-                </div>
-                <div class="bank-info" style="text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin: 20px auto; max-width: 400px; font-size: 0.95rem;">
-                    <p style="margin-bottom: 8px;">Mã đơn hàng: <strong id="co-des" style="color: white;"></strong></p>
-                    <p style="margin-bottom: 8px;">Số tiền: <strong id="co-amt" style="color: var(--accent-color);"></strong>đ</p>
-                </div>
-                <div id="payment-status">
-                     <p style="color: #ffcc00; margin-bottom: 15px;" id="payment-status-text">⏳ Đang chờ hệ thống quét giao dịch... (10s)</p>
-                     <button onclick="simulateSepayWebhook()" class="btn btn-outline" style="font-size: 0.8rem; padding: 5px 10px; border-color: #777; color: #ccc;">[Dành cho Demo] Mô Phỏng SePay Bắn Tiền</button>
-                </div>
             </div>
         </div>
     </section>
@@ -573,10 +561,9 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Xử lý luồng Checkout
-        let currentOrderId = null;
-        let pollInterval = null;
 
+
+        // Phục hồi Checkout logic để gửi API rồi chuyển hướng sang trang thanh toán
         document.addEventListener('DOMContentLoaded', () => {
             fetch('/api/products')
                 .then(r => r.json())
@@ -597,45 +584,28 @@
                 product_id: document.getElementById('co-product').value
             };
             
+            const btn = document.getElementById('co-submit-btn');
+            btn.innerText = "Đang xử lý...";
+            btn.disabled = true;
+
             fetch('/api/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(r => r.json()).then(data => {
                 if(data.order_id) {
-                    currentOrderId = data.order_id;
-                    document.getElementById('checkout-form-container').style.display = 'none';
-                    document.getElementById('checkout-qr-container').style.display = 'block';
-                    
-                    const bank = "TPBank";
-                    const account = "00005244297";
-                    
-                    document.getElementById('co-des').innerText = data.description;
-                    document.getElementById('co-amt').innerText = Number(data.amount).toLocaleString('vi-VN');
-                    document.getElementById('co-qr-img').src = `https://qr.sepay.vn/img?acc=${account}&bank=${bank}&amount=${data.amount}&des=${data.description}`;
-                    
-                    // Start polling
-                    pollInterval = setInterval(checkOrderStatus, 3000);
+                    window.location.href = `/thanhtoan?order_id=${data.order_id}&amount=${data.amount}&des=${data.description}`;
                 } else {
                     alert('Lỗi tạo đơn hàng!');
+                    btn.innerText = "Tạo Đơn Hàng & Lấy Mã QR";
+                    btn.disabled = false;
                 }
+            }).catch(e => {
+                alert("Lỗi kết nối");
+                btn.innerText = "Tạo Đơn Hàng & Lấy Mã QR";
+                btn.disabled = false;
             });
         });
-
-        function checkOrderStatus() {
-            if(!currentOrderId) return;
-            fetch('/api/order-status/' + currentOrderId)
-                .then(r => r.json())
-                .then(data => {
-                    if(data.status === 'success') {
-                        clearInterval(pollInterval);
-                        document.getElementById('payment-status').innerHTML = `
-                            <h3 style="color: #28a745; font-size: 1.5rem; margin-bottom:10px;">🎉 Thanh Toán Thành Công!</h3>
-                            <p style="color: white;">Cảm ơn bạn, hệ thống đã nhận được tiền. Đội ngũ DesGrow sẽ liên hệ bạn ngay lập tức!</p>
-                        `;
-                    }
-                });
-        }
 
         // Dành cho phương án 2: Mô phỏng test
         function simulateSepayWebhook() {

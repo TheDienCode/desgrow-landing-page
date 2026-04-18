@@ -40,6 +40,10 @@ def get_db_connection():
 def index():
     return app.send_static_file('index.html')
 
+@app.route('/thanhtoan')
+def thanhtoan():
+    return render_template('thanhtoan.html')
+
 @app.route('/admin')
 def admin():
     conn = get_db_connection()
