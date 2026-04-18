@@ -91,15 +91,25 @@ def delete_product(id):
     conn.close()
     return redirect(url_for('admin'))
 
+@app.route('/admin/products/update_stock/<int:id>', methods=('POST',))
+def update_stock(id):
+    stock = request.form['stock']
+    conn = get_db_connection()
+    conn.execute('UPDATE products SET stock = ? WHERE id = ?', (stock, id))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
+
 @app.route('/admin/customers/add', methods=('POST',))
 def add_customer():
     name = request.form['name']
     phone = request.form['phone']
+    email = request.form.get('email', '')
     zalo = request.form.get('zalo', '')
     conn = get_db_connection()
     try:
-        conn.execute('INSERT INTO customers (name, phone, zalo, registered_at) VALUES (?, ?, ?, datetime("now"))',
-                     (name, phone, zalo))
+        conn.execute('INSERT INTO customers (name, phone, email, zalo, registered_at) VALUES (?, ?, ?, ?, datetime("now"))',
+                     (name, phone, email, zalo))
         conn.commit()
     except sqlite3.IntegrityError:
         flash('Số điện thoại đã tồn tại!')

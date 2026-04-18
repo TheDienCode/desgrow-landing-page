@@ -79,6 +79,10 @@
                     <input type="text" name="phone" required>
                 </div>
                 <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email">
+                </div>
+                <div class="form-group">
                     <label>Zalo</label>
                     <input type="text" name="zalo">
                 </div>
@@ -141,6 +145,10 @@
                         </span>
                     </td>
                     <td>
+                        <form action="/admin/products/update_stock/{{ p.id }}" method="POST" style="display:inline-flex; gap: 5px; align-items: center; margin-right: 10px;">
+                            <input type="number" name="stock" value="{{ p.stock }}" style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+                            <button type="submit" class="btn btn-small" style="padding: 5px 10px;">Cập nhật</button>
+                        </form>
                         <form action="/admin/products/delete/{{ p.id }}" method="POST" style="display:inline;" onsubmit="return confirm('Chắc chắn xóa?');">
                             <button type="submit" class="btn btn-small btn-danger">Xóa</button>
                         </form>
