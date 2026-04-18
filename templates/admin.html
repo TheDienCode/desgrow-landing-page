@@ -87,12 +87,13 @@
 
             <table>
                 <tr>
-                    <th>ID</th><th>Tên</th><th>Số điện thoại</th><th>Zalo</th><th>Ngày ĐK</th><th>Hành động</th>
+                    <th>ID</th><th>Tên</th><th>Email</th><th>Số điện thoại</th><th>Zalo</th><th>Ngày ĐK</th><th>Hành động</th>
                 </tr>
                 {% for c in customers %}
                 <tr>
                     <td>{{ c.id }}</td>
                     <td>{{ c.name }}</td>
+                    <td>{{ c.email }}</td>
                     <td>{{ c.phone }}</td>
                     <td>{{ c.zalo }}</td>
                     <td>{{ c.registered_at }}</td>
