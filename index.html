@@ -422,11 +422,11 @@
                 body: new FormData(form)
             })
             .then(response => {
-                // Bật Pop-up thu tiền cọc ngay khi form gửi thành công
+                // Chuyển hướng luôn sang trang thanh toán
                 form.reset();
                 submitBtn.innerText = originalText;
                 submitBtn.disabled = false;
-                qrModal.style.display = 'flex';
+                window.location.href = '/thanhtoan';
             })
             .catch(error => {
                 alert('Có lỗi mạng xảy ra, vui lòng liên hệ nhanh qua Zalo bên góc phải!');
